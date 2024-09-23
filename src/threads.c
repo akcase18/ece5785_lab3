@@ -45,11 +45,9 @@ int main(void)
     on = false;
     counter = 0;
     TaskHandle_t main, side;
-    semaphore = xSemaphoreCreateCounting(1, 1); // Create semaphore
-    xTaskCreate(main_thread, "MainThread",
-                MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main);
-    xTaskCreate(side_thread, "SideThread",
-                SIDE_TASK_STACK_SIZE, NULL, SIDE_TASK_PRIORITY, &side);
-    vTaskStartScheduler(); // Start FreeRTOS
+    semaphore = xSemaphoreCreateCounting(1, 1);                                                    // Create semaphore
+    xTaskCreate(main_thread, "MainThread", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main); // Creating the main task
+    xTaskCreate(side_thread, "SideThread", SIDE_TASK_STACK_SIZE, NULL, SIDE_TASK_PRIORITY, &side); // Creating the secondary task
+    vTaskStartScheduler();                                                                         // Start FreeRTOS
     return 0;
 }
