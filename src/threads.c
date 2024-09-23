@@ -21,9 +21,13 @@ void side_thread(void *params)
 {
     while (1)
     {
-        vTaskDelay(100);                                              // Sleep for 100ms
-        counter += counter + 1;                                       // Increment counter
-        printf("hello world from %s! Count %d\n", "thread", counter); // Print out thread and the counter value
+        vTaskDelay(100); // Sleep for 100ms
+        xSemaphoreTake(semaphore, 0);
+        {
+            counter += counter + 1;                                       // Adding counter + 1 to counter
+            printf("hello world from %s! Count %d\n", "thread", counter); // Print out thread and the counter value
+        }
+        xSemaphoreGive(semaphore);
     }
 }
 
@@ -31,10 +35,14 @@ void main_thread(void *params)
 {
     while (1)
     {
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on);               // Flip the on-board LED from on to off, or from off to on
-        vTaskDelay(100);                                              // Sleep for 100ms
-        printf("hello world from %s! Count %d\n", "main", counter++); // Print out main and the counter value
-        on = !on;                                                     // Change the state of "on"
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on); // Flip the on-board LED from on to off, or from off to on
+        vTaskDelay(100);                                // Sleep for 100ms
+        xSemaphoreTake(semaphore, 0);
+        {
+            printf("hello world from %s! Count %d\n", "main", counter++); // Print out main and increment and print out counter
+        }
+        xSemaphoreGive(semaphore);
+        on = !on; // Change the state of "on"
     }
 }
 
@@ -44,6 +52,7 @@ int main(void)
     hard_assert(cyw43_arch_init() == PICO_OK); // Ensure that on-board LED hardware is ok
     on = false;
     counter = 0;
+    sleep_ms(5000);
     TaskHandle_t main, side;
     semaphore = xSemaphoreCreateCounting(1, 1);                                                    // Create semaphore
     xTaskCreate(main_thread, "MainThread", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main); // Creating the main task
