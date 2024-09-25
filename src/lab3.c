@@ -4,7 +4,7 @@ int side_thread_logic(int counter, SemaphoreHandle_t semaphore)
 {
     xSemaphoreTake(semaphore, 0);
     {
-        counter += counter + 1;                                       // Adding counter + 1 to counter
+        counter = counter + 1;                                       // Adding counter + 1 to counter
         printf("hello world from %s! Count %d\n", "thread", counter); // Print out thread and the counter value
     }
     xSemaphoreGive(semaphore);
