@@ -3,6 +3,7 @@
 
 #include <FreeRTOS.h>
 #include <semphr.h>
+#include <stdio.h>
 
 /**
  * Logic block inside of the side thread infinite loop. This funciton
