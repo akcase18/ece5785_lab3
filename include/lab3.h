@@ -5,6 +5,13 @@
 #include <semphr.h>
 #include <stdio.h>
 
+struct dl_args {
+    SemaphoreHandle_t semaphore1;
+    SemaphoreHandle_t semaphore2;
+    int counter;
+    char id;
+};
+
 /**
  * Logic block inside of the side thread infinite loop. This funciton
  * will take in the value of the counter, increase the value of the 
@@ -16,7 +23,7 @@
  * 
  * @return the new counter value
  */
-int side_thread_logic(int counter, SemaphoreHandle_t semaphore);
+int side_thread_logic(int *counter, SemaphoreHandle_t semaphore);
 
 /**
  * Logic block inside of the main thread infinite loop. This function
@@ -29,6 +36,10 @@ int side_thread_logic(int counter, SemaphoreHandle_t semaphore);
  * 
  * @return the incremented counter
  */
-int main_thread_logic(int counter, SemaphoreHandle_t semaphore);
+int main_thread_logic(int *counter, SemaphoreHandle_t semaphore);
+
+void deadlock(void *args);
+int orphaned_lock(int *counter, SemaphoreHandle_t semaphore);
+int unorphaned_lock(int *counter, SemaphoreHandle_t semaphore);
 
 #endif

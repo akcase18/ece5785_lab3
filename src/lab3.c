@@ -22,3 +22,34 @@ int main_thread_logic(int *counter, SemaphoreHandle_t semaphore)
     SemaphoreGive(semaphore);
     return pdTRUE;
 }
+
+void deadlock(void *args)
+{
+    struct dl_args *dlargs = (struct dl_args *)args;
+
+    TickType_t semaphore_delay = 250;
+
+    dlargs->counter++;
+    xSemaphoreTake(dlargs->semaphore1, semaphore_delay);
+    {
+        dlargs->counter++;
+        vTaskDelay(100);
+        xSemaphoreTake(dlargs->semaphore2, semaphore_delay);
+        {
+            dlargs->counter++;
+        }
+        xSemaphoreGive(dlargs->semaphore2);
+    }
+    xSemaphoreGive(dlargs->semaphore1);
+    vTaskSuspend(NULL);
+}
+
+int orphaned_lock(int *counter, SemaphoreHandle_t semaphore)
+{
+
+}
+
+int unorphaned_lock(int *counter, SemaphoreHandle_t semaphore)
+{
+
+}
