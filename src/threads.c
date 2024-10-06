@@ -23,7 +23,7 @@ void side_thread(void *params)
     while (1)
     {
         vTaskDelay(100); // Sleep for 100ms
-        counter = side_thread_logic(counter, semaphore);
+        side_thread_logic(&counter, semaphore);
     }
 }
 
@@ -33,7 +33,7 @@ void main_thread(void *params)
     {
         cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, on); // Flip the on-board LED from on to off, or from off to on
         vTaskDelay(100);                                // Sleep for 100ms
-        counter = main_thread_logic(counter, semaphore);
+        main_thread_logic(&counter, semaphore);
         on = !on; // Change the state of "on"
     }
 }

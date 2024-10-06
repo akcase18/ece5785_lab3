@@ -18,24 +18,34 @@ void test_side_thread()
 {
     int counter = 0;
     SemaphoreHandle_t semaphore;
-    TEST_ASSERT_TRUE(side_thread_logic(counter, semaphore) == 1);
+    TEST_ASSERT_TRUE(side_thread_logic(counter, semaphore) == pdTRUE);
+    TEST_ASSERT_TRUE(counter == 1);
 }
 
 void test_side_thread_locked()
 {
-
+    int counter = 0;
+    SemaphoreHandle_t semaphore;
+    xSemaphoreTake(semaphore, 0);
+    TEST_ASSERT_FALSE(side_thread_logic(counter, semaphore) == pdTRUE);
+    TEST_ASSERT_TRUE(counter == 0);
 }
 
 void test_main_thread()
 {
     int counter = 0;
     SemaphoreHandle_t semaphore;
-    TEST_ASSERT_TRUE(main_thread_logic(counter, semaphore) == 1);
+    TEST_ASSERT_TRUE(main_thread_logic(counter, semaphore) == pdTRUE);
+    TEST_ASSERT_TRUE(counter == 1);
 }
 
 void test_main_thread_locked()
 {
-
+    int counter = 0;
+    SemaphoreHandle_t semaphore;
+    xSemaphoreTake(semaphore, 0);
+    TEST_ASSERT_FALSE(main_thread_logic(counter, semaphore) == pdTRUE);
+    TEST_ASSERT_TRUE(counter == 0);
 }
 
 int main (void)
