@@ -41,13 +41,13 @@ set(PICO_BOARD pico_w CACHE STRING "Board type")
 include(${PICO_SDK_PATH}/pico_sdk_init.cmake)
 
 # This imports the library configuration for FreeRTOS
-include(${FREERTOS_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
+include(lib/freertos/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
 # This sets up the unity library. They don't provide a library export, so it's defined locally.
 include(unity.cmake)
 
 # This defines your project name, you can name it anything you want.
-project(myproject C CXX ASM)
+project(threads C CXX ASM)
 
 # These are some macros from the pico SDK that do some setup.
 pico_sdk_init()
