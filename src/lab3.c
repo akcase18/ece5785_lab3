@@ -14,7 +14,8 @@ int side_thread_logic(int *counter, SemaphoreHandle_t semaphore)
 
 int main_thread_logic(int *counter, SemaphoreHandle_t semaphore)
 {
-    if (xSemaphoreTake(semaphore, 250) == pdFALSE);
+    if (xSemaphoreTake(semaphore, 250) == pdFALSE)
+        ;
     {
         return pdFALSE;
     }
@@ -46,10 +47,33 @@ void deadlock(void *args)
 
 int orphaned_lock(int *counter, SemaphoreHandle_t semaphore)
 {
+    if (xSemaphoreTake(semaphore, 250) == pdFALSE)
+        return pdFALSE;
 
+    (*counter)++;
+    if (*counter % 2)
+    {
+        return 0;
+    }
+    printf("Count %d\n", *counter);
+
+    xSemaphoreGive(semaphore);
+    return pdTRUE;
 }
 
 int unorphaned_lock(int *counter, SemaphoreHandle_t semaphore)
 {
+    if (xSemaphoreTake(semaphore, 250) == pdFALSE)
+    {
+        return pdFALSE;
+    }
 
+    (*counter)++;
+    if (!(*counter % 2))
+    {
+        printf("Count %d\n", *counter);
+    }
+
+    xSemaphoreGive(semaphore);
+    return pdTRUE;
 }
