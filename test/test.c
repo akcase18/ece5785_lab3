@@ -12,7 +12,7 @@ void setUp(void) {}
 void tearDown(void) {}
 
 /**
- * Should increment the counter every time 
+ * Should increment the counter every time
  */
 void test_side_thread()
 {
@@ -75,27 +75,64 @@ void test_deadlock()
 
 void test_orphaned_lock()
 {
+    int counter = 1;
+    SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1, 1);
 
+    int result = orphaned_lock(&counter, semaphore);
+    TEST_ASSERT_TRUE(counter == 2);
+    TEST_ASSERT_TRUE(result == pdTRUE);
+    TEST_ASSERT_TRUE(uxSemaphoreGetCount(semaphore) == 1);
+
+    result = orphaned_lock(&counter, semaphore);
+    TEST_ASSERT_TRUE(counter == 3);
+    TEST_ASSERT_TRUE(result == pdFALSE);
+    TEST_ASSERT_TRUE(uxSemaphoreGetCount(semaphore) == 0);
+
+    result = orphaned_lock(&counter, semaphore);
+    TEST_ASSERT_TRUE(counter == 3);
+    TEST_ASSERT_TRUE(result == pdFALSE);
+    TEST_ASSERT_TRUE(uxSemaphoreGetCount(semaphore) == 0);
 }
 
 void test_unorphaned_lock()
 {
+    int counter = 1;
+    SemaphoreHandle_t semaphore = xSemaphoreCreateCounting(1, 1);
 
+    int result;
+    result = unorphaned_lock(&counter, semaphore);
+    TEST_ASSERT_TRUE(counter == 2);
+    TEST_ASSERT_TRUE(result == pdTRUE);
+    TEST_ASSERT_TRUE(uxSemaphoreGetCount(semaphore) == 1);
+
+    result = unorphaned_lock(&counter, semaphore);
+    TEST_ASSERT_TRUE(counter == 3);
+    TEST_ASSERT_TRUE(result == pdTRUE);
+    TEST_ASSERT_TRUE(uxSemaphoreGetCount(semaphore) == 1);
 }
 
-int main (void)
+void runner_thread(__unused void *args)
+{
+    while (1)
+    {
+        UNITY_BEGIN();
+        RUN_TEST(test_side_thread);
+        RUN_TEST(test_side_thread_locked);
+        RUN_TEST(test_main_thread);
+        RUN_TEST(test_main_thread_locked);
+        RUN_TEST(test_deadlock);
+        RUN_TEST(test_orphaned_lock);
+        RUN_TEST(test_unorphaned_lock);
+        // sleep_ms(5000);
+        return UNITY_END();
+    }
+}
+
+int main(void)
 {
     stdio_init_all();
-    // sleep_ms(5000); // Give time for TTY to attach.
-    // printf("Start tests\n");
-    UNITY_BEGIN();
-    RUN_TEST(test_side_thread);
-    RUN_TEST(test_side_thread_locked);
-    RUN_TEST(test_main_thread);
-    RUN_TEST(test_main_thread_locked);
-    RUN_TEST(test_deadlock);
-    RUN_TEST(test_orphaned_lock);
-    RUN_TEST(test_unorphaned_lock);
-    // sleep_ms(5000);
-    return UNITY_END();
+    hard_assert(cyw43_arch_init() == PICO_OK);
+    xTaskCreate(runner_thread, "TestRunner", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
+    vTaskStartScheduler();
+    return 0;
 }
